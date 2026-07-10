@@ -20,6 +20,9 @@ TISTORY_BLOGS = [
     "plansaver.tistory.com",
 ]
 NAVER_BLOG_ID = "jlpyslkah"
+WORDPRESS_SITES = [
+    "lifeforteacher.com",
+]
 
 
 def fetch(url, timeout=15):
@@ -103,6 +106,33 @@ def collect_naver(blog_id):
     return posts
 
 
+def collect_wordpress(site):
+    posts = []
+    page = 1
+    blog_name = site.split(".")[0]
+    while True:
+        url = f"https://{site}/wp-json/wp/v2/posts?per_page=50&page={page}&_fields=title,link"
+        try:
+            raw = fetch_retry(url)
+            data = json.loads(raw)
+        except Exception as e:
+            print(f"[{site}] page {page} 오류: {e}", flush=True)
+            break
+        if not data:
+            break
+        for p in data:
+            title = (p.get("title") or {}).get("rendered", "")
+            link = p.get("link", "")
+            if title and link:
+                posts.append({"title": title, "url": link, "blog": blog_name})
+        if len(data) < 50:
+            break
+        page += 1
+        time.sleep(0.3)
+    print(f"[{site}] {len(posts)}개", flush=True)
+    return posts
+
+
 def clean_title(t):
     for _ in range(3):
         t = html.unescape(t)
@@ -116,6 +146,11 @@ def main():
             all_posts.extend(collect_tistory(b))
         except Exception as e:
             print(f"[{b}] 실패: {e}", flush=True)
+    for s in WORDPRESS_SITES:
+        try:
+            all_posts.extend(collect_wordpress(s))
+        except Exception as e:
+            print(f"[{s}] 실패: {e}", flush=True)
 
     seen = set()
     compact = []
