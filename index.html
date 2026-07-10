@@ -436,7 +436,8 @@ function renderPosts() {
   for (const p of allPosts()) byBlog[p.b] = (byBlog[p.b] || 0) + 1;
   $("countsBox").innerHTML =
     `총 <b>${allPosts().length}개</b> · ` +
-    Object.entries(byBlog).map(([b, n]) => `${escapeHtml(b)} ${n}`).join(" · ");
+    Object.entries(byBlog).map(([b, n]) => `${escapeHtml(b)} ${n}`).join(" · ") +
+    (window.POSTS_UPDATED ? `<br>목록 자동 갱신: ${escapeHtml(window.POSTS_UPDATED)} (매일 아침 6시 자동 수집)` : "");
   const list = $("postList");
   list.innerHTML = "";
   const userUrls = new Set(getJSON(LS.userPosts, []).map(p => p.u));
