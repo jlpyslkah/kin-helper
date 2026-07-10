@@ -274,7 +274,7 @@ function candidatePosts(question, limit = 60) {
 }
 
 /* ===================== Gemini 호출 ===================== */
-const MODELS = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+const MODELS = ["gemini-3.1-flash-lite", "gemini-3.5-flash", "gemini-2.5-flash"];
 async function callGemini(prompt) {
   const key = localStorage.getItem(LS.key);
   if (!key) throw new Error("NO_KEY");
